@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Button from './Button';
 import logoImg from '../assets/logo.png';
 
 const NavBar = ({ links }) => {
-    const [activeLink, setActiveLink] = useState('Home');
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Set active link based on current path
+    const getActiveLabel = () => {
+        if (location.pathname === '/') return 'Home';
+        const link = links.find(l => l.href === location.pathname);
+        return link ? link.label : '';
+    };
+
+    const activeLink = getActiveLabel();
 
     const navStyle = {
         backgroundColor: '#FFFFFF',
@@ -28,7 +39,7 @@ const NavBar = ({ links }) => {
         textDecoration: 'none',
         fontWeight: '600',
         fontSize: '20px',
-        fontfamily: 'bolt',
+        fontFamily: 'inherit', // Fixed typo 'fontfamily' to 'fontFamily' and used inherit
         cursor: 'pointer',
         transition: 'all 0.3s ease',
         padding: '10px 20px',
@@ -39,32 +50,52 @@ const NavBar = ({ links }) => {
 
     return (
         <nav style={navStyle}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/')}>
                 <img src={logoImg} alt="Wellmaid Logo" style={{ height: '80px', objectFit: 'contain' }} />
             </div>
 
             <ul style={linkContainerStyle}>
                 {links.map((link) => (
                     <li key={link.label}>
-                        <a
-                            href={link.href}
-                            style={getLinkStyle(link.label)}
-                            onClick={() => setActiveLink(link.label)}
-                            onMouseEnter={(e) => {
-                                if (activeLink !== link.label) {
-                                    e.target.style.backgroundColor = 'rgba(0, 90, 226, 0.04)';
-                                    e.target.style.color = '#005AE2';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (activeLink !== link.label) {
-                                    e.target.style.backgroundColor = 'transparent';
-                                    e.target.style.color = '#64748B';
-                                }
-                            }}
-                        >
-                            {link.label}
-                        </a>
+                        {link.href.startsWith('/#') ? (
+                            <a
+                                href={link.href}
+                                style={getLinkStyle(link.label)}
+                                onMouseEnter={(e) => {
+                                    if (activeLink !== link.label) {
+                                        e.target.style.backgroundColor = 'rgba(0, 90, 226, 0.04)';
+                                        e.target.style.color = '#005AE2';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (activeLink !== link.label) {
+                                        e.target.style.backgroundColor = 'transparent';
+                                        e.target.style.color = '#64748B';
+                                    }
+                                }}
+                            >
+                                {link.label}
+                            </a>
+                        ) : (
+                            <Link
+                                to={link.href}
+                                style={getLinkStyle(link.label)}
+                                onMouseEnter={(e) => {
+                                    if (activeLink !== link.label) {
+                                        e.target.style.backgroundColor = 'rgba(0, 90, 226, 0.04)';
+                                        e.target.style.color = '#005AE2';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (activeLink !== link.label) {
+                                        e.target.style.backgroundColor = 'transparent';
+                                        e.target.style.color = '#64748B';
+                                    }
+                                }}
+                            >
+                                {link.label}
+                            </Link>
+                        )}
                     </li>
                 ))}
             </ul>
@@ -76,6 +107,7 @@ const NavBar = ({ links }) => {
                     colorScheme="blue"
                     padding="12px 28px"
                     fontSize="24px"
+                    onClick={() => navigate('/login')}
                 />
                 <Button
                     text="Sign Up"
@@ -83,6 +115,7 @@ const NavBar = ({ links }) => {
                     colorScheme="orange"
                     padding="12px 24px"
                     fontSize="24px"
+                    onClick={() => navigate('/signup')}
                 />
             </div>
         </nav>
@@ -90,3 +123,4 @@ const NavBar = ({ links }) => {
 };
 
 export default NavBar;
+
