@@ -1,6 +1,7 @@
 const Service = require('../models/Service');
 const Branch = require('../models/Branch');
 const Doctor = require('../models/Doctor');
+const cloudinary = require('../config/cloudinary');
 
 // Services
 exports.addService = async (req, res) => {
@@ -45,6 +46,34 @@ exports.getDoctors = async (req, res) => {
         const doctors = await Doctor.find();
         res.json(doctors);
     } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+// Generic Image Upload
+exports.uploadImage = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        // Upload to cloudinary
+        const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                { folder: 'hospital-system' },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
+            uploadStream.end(req.file.buffer);
+        });
+
+        res.json({
+            message: 'Upload successful',
+            url: result.secure_url
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 };
 
 // Delete routes (Admin only)

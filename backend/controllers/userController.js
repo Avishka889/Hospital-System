@@ -81,3 +81,37 @@ exports.loginUser = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+// @desc    Update user profile
+// @route   PUT /api/users/profile/:id
+exports.updateUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.firstName = req.body.firstName || user.firstName;
+        user.lastName = req.body.lastName || user.lastName;
+        user.telephone = req.body.telephone || user.telephone;
+        user.email = req.body.email || user.email;
+        user.profilePic = req.body.profilePic || user.profilePic;
+
+        const updatedUser = await user.save();
+
+        res.json({
+            message: 'Profile updated successfully',
+            user: {
+                id: updatedUser._id,
+                firstName: updatedUser.firstName,
+                lastName: updatedUser.lastName,
+                telephone: updatedUser.telephone,
+                email: updatedUser.email,
+                profilePic: updatedUser.profilePic
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
